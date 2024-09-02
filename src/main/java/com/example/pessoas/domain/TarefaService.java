@@ -33,4 +33,13 @@ public class TarefaService {
     public List<Tarefa> getTarefasPendentes() {
         return tarefaRepository.findTop3ByPessoaAlocadaIsNullOrderByPrazoAsc();
     }
+
+    public Boolean delete(Long id) {
+
+        if(id != null) {
+            tarefaRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
 }

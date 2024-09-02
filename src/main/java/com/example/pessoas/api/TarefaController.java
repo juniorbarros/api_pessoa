@@ -4,6 +4,7 @@ package com.example.pessoas.api;
 import com.example.pessoas.domain.*;
 import com.example.pessoas.domain.dto.TarefaDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -48,7 +49,8 @@ public class TarefaController {
             || (request.getDescricao() == null || request.getDescricao().isEmpty())
             || (request.getDepartamento_id() == null) )
             {
-                return ResponseEntity.badRequest().build();
+                String mensagemErro = "Atenação para os campos Obrigatórios: titulo, descricao, id departamento.";
+                return new ResponseEntity<>(mensagemErro, HttpStatus.BAD_REQUEST);
             }
 
             Tarefa tf = new Tarefa();
@@ -57,6 +59,7 @@ public class TarefaController {
             tf.setDescricao(request.getDescricao());
             tf.setPrazo(LocalDateTime.now());
             tf.setDuracao(request.getDuracao());
+            tf.setFinalizado(request.getFinalizado());
 
             if(request.getDepartamento_id() != null){
                 Departamento departamento = departamentoRepository.findById(request.getDepartamento_id())
@@ -86,7 +89,8 @@ public class TarefaController {
     public ResponseEntity putAlocarTarefa(@PathVariable Long id, @RequestBody TarefaDTO request){
 
         if(id == null || request.getPessoa_id() == null){
-            return ResponseEntity.badRequest().build();
+            String mensagemErro = "Verifique id do departamento ou id da pessoa Campos Obrigatórios.";
+            return new ResponseEntity<>(mensagemErro, HttpStatus.BAD_REQUEST);
         }
 
         Optional<Tarefa> tarefaOptional  = tarefaRepository.findById(id);
@@ -119,6 +123,17 @@ public class TarefaController {
 
         if(tarefaOptional.isPresent()){
             Tarefa tf = tarefaOptional.get();
+
+            if(tf.getPessoa() == null){
+                String mensagemErro = "Tarefa não alocada não pode ser finalizada.";
+                return new ResponseEntity<>(mensagemErro, HttpStatus.BAD_REQUEST);
+            }
+            if(tf.getFinalizado()){
+                String mensagemErro = "Tarefa já finalizada.";
+                return new ResponseEntity<>(mensagemErro, HttpStatus.BAD_REQUEST);
+            }
+
+
 
             LocalDateTime dt = tf.getPrazo();
             LocalDateTime dx = LocalDateTime.now();

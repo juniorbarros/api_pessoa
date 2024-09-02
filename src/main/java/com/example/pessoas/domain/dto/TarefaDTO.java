@@ -18,6 +18,7 @@ public class TarefaDTO {
     private Long departamento_id;
     private Departamento departamento;
     private Pessoa pessoa;
+    private Boolean finalizado;
 
     public static TarefaDTO create(Tarefa pd) {
         ModelMapper modelMapper = new ModelMapper();
